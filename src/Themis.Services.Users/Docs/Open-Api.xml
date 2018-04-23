@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Themis.Services.Users</name>
+    </assembly>
+    <members>
+        <member name="M:Themis.Services.Users.Controllers.UsersController.Get(System.String)">
+            <summary>
+                Gets the profile for a user
+            </summary>
+            <param name="emailAddress">Email address of the user</param>
+        </member>
+        <member name="M:Themis.Services.Users.Repositories.UserRepository.GetProfile(System.String)">
+            <summary>
+            Gets the profile linked to a specific user
+            </summary>
+            <param name="emailAddress">Email address of the user</param>
+        </member>
+    </members>
+</doc>
