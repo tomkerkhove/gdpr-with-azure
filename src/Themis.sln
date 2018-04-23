@@ -7,6 +7,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{E0
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Themis.Services.Users", "Themis.Services.Users\Themis.Services.Users.csproj", "{19761CBC-F91D-4E00-B54D-F99357F55E7E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Themis.Services.Portal", "Themis.Services.Portal\Themis.Services.Portal.csproj", "{863BCC50-3500-48F2-9468-B458CEE12E8A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,12 +19,17 @@ Global
 		{19761CBC-F91D-4E00-B54D-F99357F55E7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{19761CBC-F91D-4E00-B54D-F99357F55E7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{19761CBC-F91D-4E00-B54D-F99357F55E7E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{863BCC50-3500-48F2-9468-B458CEE12E8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{863BCC50-3500-48F2-9468-B458CEE12E8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{863BCC50-3500-48F2-9468-B458CEE12E8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{863BCC50-3500-48F2-9468-B458CEE12E8A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{19761CBC-F91D-4E00-B54D-F99357F55E7E} = {E07FE2DE-0527-4707-92B0-0A5B1A952773}
+		{863BCC50-3500-48F2-9468-B458CEE12E8A} = {E07FE2DE-0527-4707-92B0-0A5B1A952773}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F9DA3E69-C12C-4E99-9BBA-0BE39B300A03}
