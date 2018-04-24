@@ -7,3 +7,5 @@ Scenarios on how you can use Microsoft Azure services to be GDPR compliant:
 
 ## Make user information available on request
 [Discussion in issues #1](https://github.com/tomkerkhove/gdpr-with-azure/issues/1)
+
+![Scenario - Make user information available on request](media/consolidate-user-data.png)
