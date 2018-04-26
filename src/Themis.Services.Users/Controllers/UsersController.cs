@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Themis.Services.Users.Contracts;
@@ -9,7 +10,12 @@ namespace Themis.Services.Users.Controllers
     [Route("api/users")]
     public class UsersController : Controller
     {
-        private readonly UserRepository _userRepository = new UserRepository();
+        private readonly UserRepository _userRepository;
+
+        public UsersController(UserRepository userRepository)
+        {
+            _userRepository = userRepository;
+        }
 
         /// <summary>
         ///     Gets the profile for a user
@@ -17,13 +23,13 @@ namespace Themis.Services.Users.Controllers
         /// <param name="emailAddress">Email address of the user</param>
         [HttpGet]
         [Route("api/users/{emailAddress}/profile")]
-        [SwaggerResponse((int) HttpStatusCode.NotFound, Description =
+        [SwaggerResponse((int)HttpStatusCode.NotFound, Description =
             "No profile was used with the specified email address")]
-        [SwaggerResponse((int) HttpStatusCode.OK,
+        [SwaggerResponse((int)HttpStatusCode.OK,
             Description = "Profile information linked to the specified email address", Type = typeof(UserProfile))]
-        public ActionResult Get(string emailAddress)
+        public async Task<IActionResult> Get(string emailAddress)
         {
-            var userProfile = _userRepository.GetProfile(emailAddress);
+            var userProfile = await _userRepository.GetProfileAsync(emailAddress);
             if (userProfile == null)
             {
                 return NotFound();

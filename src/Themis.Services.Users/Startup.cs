@@ -2,23 +2,68 @@
 using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
+using Themis.Services.Users.Repositories;
+using Themis.Services.Users.Sql;
 
 namespace Themis.Services.Users
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup()
         {
-            Configuration = configuration;
+            var configurationBuilder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.Development.json")
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables();
+
+            Configuration = configurationBuilder.Build();
         }
 
         public IConfiguration Configuration { get; }
 
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
+            app.UseMvc();
+            ConfigureSwagger(app);
+        }
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddMvc();
+            services.AddScoped<UserRepository>();
+
+            ConfigureSwaggerGeneration(services);
+            ConfigureSql(services);
+        }
+
+        private static void ConfigureSwagger(IApplicationBuilder app)
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI(swaggerUiOptions =>
+            {
+                swaggerUiOptions.SwaggerEndpoint("/swagger/v1/swagger.json", "Users Service");
+                swaggerUiOptions.DisplayOperationId();
+                swaggerUiOptions.EnableDeepLinking();
+                swaggerUiOptions.DocumentTitle = "Users Service";
+                swaggerUiOptions.DocExpansion(DocExpansion.List);
+                swaggerUiOptions.DisplayRequestDuration();
+                swaggerUiOptions.EnableFilter();
+            });
+        }
+
+        private static void ConfigureSwaggerGeneration(IServiceCollection services)
         {
             var xmlDocumentationPath = GetXmlDocumentationPath(services);
             var openApiInformation = new Info
@@ -38,7 +83,6 @@ namespace Themis.Services.Users
                 }
             };
 
-            services.AddMvc();
             services.AddSwaggerGen(swaggerGenerationOptions =>
             {
                 swaggerGenerationOptions.SwaggerDoc($"v1", openApiInformation);
@@ -51,28 +95,6 @@ namespace Themis.Services.Users
             });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
-            app.UseMvc();
-            app.UseSwagger();
-            app.UseSwaggerUI(swaggerUiOptions =>
-            {
-                swaggerUiOptions.SwaggerEndpoint("/swagger/v1/swagger.json", "Users Service");
-                swaggerUiOptions.DisplayOperationId();
-                swaggerUiOptions.EnableDeepLinking();
-                swaggerUiOptions.DocumentTitle = "Users Service";
-                swaggerUiOptions.DocExpansion(DocExpansion.List);
-                swaggerUiOptions.DisplayRequestDuration();
-                swaggerUiOptions.EnableFilter();
-            });
-        }
-
         private static string GetXmlDocumentationPath(IServiceCollection services)
         {
             var hostingEnvironment =
@@ -82,10 +104,16 @@ namespace Themis.Services.Users
                 return string.Empty;
             }
 
-            var contentRootPath = ((IHostingEnvironment) hostingEnvironment.ImplementationInstance).ContentRootPath;
+            var contentRootPath = ((IHostingEnvironment)hostingEnvironment.ImplementationInstance).ContentRootPath;
             var xmlDocumentationPath = $"{contentRootPath}\\Docs\\Open-Api.xml";
 
             return File.Exists(xmlDocumentationPath) ? xmlDocumentationPath : string.Empty;
+        }
+
+        private void ConfigureSql(IServiceCollection services)
+        {
+            services.AddDbContext<UserDbContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("ThemisUsers")));
         }
     }
 }
