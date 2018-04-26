@@ -6,15 +6,22 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
+using Themis.Services.Users.Repositories;
 using Themis.Services.Users.Sql;
 
 namespace Themis.Services.Users
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup()
         {
-            Configuration = configuration;
+            var configurationBuilder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.Development.json")
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables();
+
+            Configuration = configurationBuilder.Build();
         }
 
         public IConfiguration Configuration { get; }
@@ -35,6 +42,7 @@ namespace Themis.Services.Users
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            services.AddScoped<UserRepository>();
 
             ConfigureSwaggerGeneration(services);
             ConfigureSql(services);
@@ -45,7 +53,7 @@ namespace Themis.Services.Users
             app.UseSwagger();
             app.UseSwaggerUI(swaggerUiOptions =>
             {
-                swaggerUiOptions.SwaggerEndpoint(url: "/swagger/v1/swagger.json", name: "Users Service");
+                swaggerUiOptions.SwaggerEndpoint("/swagger/v1/swagger.json", "Users Service");
                 swaggerUiOptions.DisplayOperationId();
                 swaggerUiOptions.EnableDeepLinking();
                 swaggerUiOptions.DocumentTitle = "Users Service";
@@ -96,7 +104,7 @@ namespace Themis.Services.Users
                 return string.Empty;
             }
 
-            var contentRootPath = ((IHostingEnvironment) hostingEnvironment.ImplementationInstance).ContentRootPath;
+            var contentRootPath = ((IHostingEnvironment)hostingEnvironment.ImplementationInstance).ContentRootPath;
             var xmlDocumentationPath = $"{contentRootPath}\\Docs\\Open-Api.xml";
 
             return File.Exists(xmlDocumentationPath) ? xmlDocumentationPath : string.Empty;
@@ -105,7 +113,7 @@ namespace Themis.Services.Users
         private void ConfigureSql(IServiceCollection services)
         {
             services.AddDbContext<UserDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString(name: "BloggingDatabase")));
+                options.UseSqlServer(Configuration.GetConnectionString("ThemisUsers")));
         }
     }
 }

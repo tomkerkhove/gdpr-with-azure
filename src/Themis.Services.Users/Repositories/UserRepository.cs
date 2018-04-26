@@ -1,34 +1,36 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Themis.Services.Users.Contracts;
+using Themis.Services.Users.Sql;
 
 namespace Themis.Services.Users.Repositories
 {
     public class UserRepository
     {
-        private readonly List<UserProfile> _userProfiles = new List<UserProfile>
+        private readonly UserDbContext dbContext;
+
+        public UserRepository(UserDbContext dbContext)
         {
-            new UserProfile
-            {
-                FirstName = "Bill",
-                LastName = "Bracket",
-                EmailAddress = "Bill.Bracket@codito.com"
-            },
-            new UserProfile
-            {
-                FirstName = "Tom",
-                LastName = "Kerkhove",
-                EmailAddress = "Tom.Kerkhove@codit.eu"
-            }
-        };
+            this.dbContext = dbContext;
+        }
 
         /// <summary>
         /// Gets the profile linked to a specific user
         /// </summary>
         /// <param name="emailAddress">Email address of the user</param>
-        public UserProfile GetProfile(string emailAddress)
+        public async Task<UserProfile> GetProfileAsync(string emailAddress)
         {
-            return _userProfiles.SingleOrDefault(user => user.EmailAddress == emailAddress);
+            var potentialUser = await dbContext.Users.Where(user => user.EmailAddress.ToLower() == emailAddress.ToLower())
+                                                    .Select(user => new UserProfile
+                                                                    {
+                                                                        EmailAddress = user.EmailAddress,
+                                                                        FirstName = user.FirstName,
+                                                                        LastName = user.LastName
+                                                                    })
+                                                    .SingleOrDefaultAsync();
+
+            return potentialUser;
         }
     }
 }
