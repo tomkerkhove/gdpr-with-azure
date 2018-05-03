@@ -22,7 +22,7 @@ namespace Themis.Services.Users.Controllers
         /// </summary>
         /// <param name="emailAddress">Email address of the user</param>
         [HttpGet]
-        [Route("api/users/{emailAddress}/profile")]
+        [Route("{emailAddress}/profile")]
         [SwaggerResponse((int)HttpStatusCode.NotFound, Description =
             "No profile was used with the specified email address")]
         [SwaggerResponse((int)HttpStatusCode.OK,
