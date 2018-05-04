@@ -16,19 +16,21 @@ namespace Themis.Services.Users.Repositories
         }
 
         /// <summary>
-        /// Gets the profile linked to a specific user
+        ///     Gets the profile linked to a specific user
         /// </summary>
         /// <param name="emailAddress">Email address of the user</param>
         public async Task<UserProfile> GetProfileAsync(string emailAddress)
         {
-            var potentialUser = await dbContext.Users.Where(user => user.EmailAddress.ToLower() == emailAddress.ToLower())
-                                                    .Select(user => new UserProfile
-                                                                    {
-                                                                        EmailAddress = user.EmailAddress,
-                                                                        FirstName = user.FirstName,
-                                                                        LastName = user.LastName
-                                                                    })
-                                                    .SingleOrDefaultAsync();
+            var potentialUser = await dbContext.Users
+                .Where(user => user.EmailAddress.ToLower() == emailAddress.ToLower())
+                .Select(user => new UserProfile
+                {
+                    DisplayName = user.DisplayName,
+                    EmailAddress = user.EmailAddress,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName
+                })
+                .SingleOrDefaultAsync();
 
             return potentialUser;
         }
