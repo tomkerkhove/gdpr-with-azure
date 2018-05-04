@@ -8,6 +8,9 @@ namespace Themis.Services.Users.Sql.Schema
         public string FirstName { get; set; }
 
         [Required]
+        public string DisplayName { get; set; }
+
+        [Required]
         public string LastName { get; set; }
 
         [Key]

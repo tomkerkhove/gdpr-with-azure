@@ -30,6 +30,9 @@ namespace Themis.Services.Users.Sql.Migrations
                     b.Property<string>("Country")
                         .IsRequired();
 
+                    b.Property<string>("DisplayName")
+                        .IsRequired();
+
                     b.Property<string>("FirstName")
                         .IsRequired();
 

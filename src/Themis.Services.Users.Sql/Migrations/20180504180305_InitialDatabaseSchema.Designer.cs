@@ -10,8 +10,8 @@ using Themis.Services.Users.Sql;
 namespace Themis.Services.Users.Sql.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20180426180102_InitialSchema")]
-    partial class InitialSchema
+    [Migration("20180504180305_InitialDatabaseSchema")]
+    partial class InitialDatabaseSchema
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -29,6 +29,9 @@ namespace Themis.Services.Users.Sql.Migrations
                         .IsRequired();
 
                     b.Property<string>("Country")
+                        .IsRequired();
+
+                    b.Property<string>("DisplayName")
                         .IsRequired();
 
                     b.Property<string>("FirstName")
