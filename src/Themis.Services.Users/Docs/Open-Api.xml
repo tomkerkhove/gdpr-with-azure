@@ -12,7 +12,7 @@
         </member>
         <member name="M:Themis.Services.Users.Repositories.UserRepository.GetProfileAsync(System.String)">
             <summary>
-            Gets the profile linked to a specific user
+                Gets the profile linked to a specific user
             </summary>
             <param name="emailAddress">Email address of the user</param>
         </member>
