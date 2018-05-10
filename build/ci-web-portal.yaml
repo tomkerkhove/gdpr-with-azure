@@ -2,19 +2,22 @@ resources:
 - repo: self
 queue:
   name: Hosted VS2017
+variables:
+  projects.build: 'src/Themis.Services.Portal/Themis.Services.Portal.csproj'
+  projects.tests: '**/*Tests/*.csproj'
 steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: restore
-    projects: '$(Parameters.RestoreBuildProjects)'
+    projects: '$(projects.build)'
 - task: DotNetCoreCLI@2
   inputs:
-    projects: '$(Parameters.RestoreBuildProjects)'
+    projects: '$(projects.build)'
     arguments: '--configuration $(BuildConfiguration)'
 - task: DotNetCoreCLI@2
   inputs:
     command: test
-    projects: '$(Parameters.TestProjects)'
+    projects: '$(projects.tests)'
     arguments: '--configuration $(BuildConfiguration)'
 - task: DotNetCoreCLI@2
   inputs:
