@@ -5,6 +5,8 @@ queue:
 variables:
   projects.build: 'src/Themis.Services.Portal/Themis.Services.Portal.csproj'
   projects.tests: '**/*Tests/*.csproj'
+  BuildConfiguration: release
+  BuildPlatform: any cpu
 steps:
 - task: DotNetCoreCLI@2
   inputs:
