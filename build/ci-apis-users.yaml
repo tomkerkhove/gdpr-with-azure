@@ -14,21 +14,25 @@ steps:
     command: restore
     projects: '$(projects.build)'
 - task: DotNetCoreCLI@2
+  displayName: Build
   inputs:
     projects: '$(projects.build)'
     arguments: '--configuration $(BuildConfiguration)'
 - task: DotNetCoreCLI@2
+  displayName: Test
   inputs:
     command: test
     projects: '$(projects.tests)'
     arguments: '--configuration $(BuildConfiguration)'
 - task: DotNetCoreCLI@2
+  displayName: Publish Output To Artifacts
   inputs:
     command: publish
     publishWebProjects: True
     arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
     zipAfterPublish: True
 - task: PublishBuildArtifacts@1
+  displayName: Publish Artifacts
   inputs:
     PathtoPublish: '$(build.artifactstagingdirectory)'
     ArtifactName: Package
