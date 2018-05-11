@@ -1,0 +1,36 @@
+﻿DECLARE @userDisplayName string = "tom kerkhove";
+
+/*
+ * Gets all the user profiles across all the websites for a specific display name linked to an account
+ */
+
+@users =
+    EXTRACT Source string,
+            Id int,
+            DisplayName string,
+            Reputation int,
+            CreationDate DateTime,
+            LastAccessDate DateTime,
+            Location string,
+            AboutMe string,
+            Views int,
+            UpVotes int,
+            DownVotes int,
+            Age int,
+            AccountId int,
+            ProfileImageUrl string,
+            WebsiteUrl string
+    FROM "/aggregated-data/users.csv"
+    USING Extractors.Csv();
+    
+@foundUsers = SELECT DisplayName,
+                     Source AS SiteSource,
+                     Id AS UserId,
+                     AccountId
+              FROM @users
+              WHERE DisplayName.ToLower() == @userDisplayName;
+    
+OUTPUT @foundUsers
+TO "gdpr/users-by-display-name.csv"
+ORDER BY DisplayName, SiteSource
+USING Outputters.Csv(outputHeader: true);
