@@ -28,7 +28,8 @@ steps:
   displayName: Publish Output To Artifacts
   inputs:
     command: publish
-    publishWebProjects: True
+    publishWebProjects: false
+    projects: '$(projects.build)'
     arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
     zipAfterPublish: True
 - task: PublishBuildArtifacts@1
