@@ -1,4 +1,5 @@
 ﻿DECLARE @userDisplayName string = "tom kerkhove";
+DECLARE @outputPathFormat string = "gdpr/consolidated-data/tom.kerkhove@codit.eu/{0}";
 
 /*
  * Gets all the user profiles across all the websites for a specific display name linked to an account
@@ -31,6 +32,6 @@
               WHERE DisplayName.ToLower() == @userDisplayName;
     
 OUTPUT @foundUsers
-TO "gdpr/users-by-display-name.csv"
+TO string.Format(@outputPathFormat, "user.csv")
 ORDER BY DisplayName, SiteSource
 USING Outputters.Csv(outputHeader: true);
