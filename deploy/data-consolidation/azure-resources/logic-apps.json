@@ -1,0 +1,359 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "Connections.SendGrid.Name": {
+            "defaultValue": "sendgrid",
+            "type": "String"
+        },
+        "Connections.AzureBlobStorage.Name": {
+            "defaultValue": "azureblob",
+            "type": "String"
+        },
+        "Apis.Users.HostName": {
+            "defaultValue": "gdpr-with-azure-api-users.azurewebsites.net",
+            "type": "String"
+        },
+        "LogicApp.SummaryWorkflow.Name": {
+            "defaultValue": "gdpr-with-azure-data-consolidation-summary",
+            "type": "String"
+        },
+        "LogicApp.TriggerWorkflow.Name": {
+            "defaultValue": "gdpr-with-azure-data-consolidation-trigger",
+            "type": "String"
+        },
+        "ApiManagement.Operations.TriggerConsolidation": {
+            "defaultValue": "/subscriptions/0f9d7fea-99e8-4768-8672-06a28514f77e/resourceGroups/api-management/providers/Microsoft.ApiManagement/service/tomkerkhove/apis/data-consolidation-api",
+            "type": "String"
+        },
+        "ApiManagement.Security.ApiKey": {
+            "defaultValue": null,
+            "type": "SecureString"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Logic/workflows",
+            "name": "[parameters('LogicApp.SummaryWorkflow.Name')]",
+            "apiVersion": "2017-07-01",
+            "location": "westeurope",
+            "tags": {},
+            "scale": null,
+            "properties": {
+                "state": "Enabled",
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "$connections": {
+                            "defaultValue": {},
+                            "type": "Object"
+                        }
+                    },
+                    "triggers": {
+                        "manual": {
+                            "type": "Request",
+                            "kind": "Http",
+                            "inputs": {
+                                "method": "POST",
+                                "schema": {
+                                    "properties": {
+                                        "emailAddress": {
+                                            "type": "string"
+                                        },
+                                        "fileUris": {
+                                            "items": {
+                                                "type": "string"
+                                            },
+                                            "type": "array"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "actions": {
+                        "For_each": {
+                            "foreach": "@triggerBody()?['fileUris']",
+                            "actions": {
+                                "Append_to_string_variable": {
+                                    "runAfter": {
+                                        "Create_SAS_URI_by_path": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "AppendToStringVariable",
+                                    "inputs": {
+                                        "name": "FilesAvailableForDownload",
+                                        "value": "<li><a href=\"@{body('Create_SAS_URI_by_path')?['WebUrl']}\">Download</a></li>"
+                                    }
+                                },
+                                "Create_SAS_URI_by_path": {
+                                    "runAfter": {},
+                                    "type": "ApiConnection",
+                                    "inputs": {
+                                        "body": {
+                                            "Permissions": "Read"
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "path": "/datasets/default/CreateSharedLinkByPath",
+                                        "queries": {
+                                            "path": "user-data/@{items('For_each')}"
+                                        }
+                                    }
+                                }
+                            },
+                            "runAfter": {
+                                "Initialize_variable": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Foreach"
+                        },
+                        "Get_User_By_Email_Address": {
+                            "runAfter": {},
+                            "metadata": {
+                                "apiDefinitionUrl": "[concat('https://', parameters('Apis.Users.HostName'), '/swagger/v1/swagger.json')]",
+                                "swaggerSource": "custom"
+                            },
+                            "type": "Http",
+                            "inputs": {
+                                "method": "get",
+                                "uri": "[concat('https://', parameters('Apis.Users.HostName'), 'api/users/@{encodeURIComponent(triggerBody()?[''emailAddress''])}/profile')]"
+                            }
+                        },
+                        "Initialize_variable": {
+                            "runAfter": {
+                                "Get_User_By_Email_Address": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "FilesAvailableForDownload",
+                                        "type": "String",
+                                        "value": "<ul>"
+                                    }
+                                ]
+                            }
+                        },
+                        "List_of_files_to_download_-_Close_list_tag": {
+                            "runAfter": {
+                                "For_each": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "AppendToStringVariable",
+                            "inputs": {
+                                "name": "FilesAvailableForDownload",
+                                "value": "</ul>"
+                            }
+                        },
+                        "Send_email_(V2)": {
+                            "runAfter": {
+                                "List_of_files_to_download_-_Close_list_tag": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "body": {
+                                    "from": "kerkhove.tom@gmail.com",
+                                    "fromname": "GDPR with Azure",
+                                    "ishtml": true,
+                                    "subject": "GDPR with Azure - Here is your data!",
+                                    "text": "Hi @{body('Get_User_By_Email_Address')?['firstName']},<br />\n<br />\nWe have finished gathering all your information and are available for download for the next 24h.<br />\n@{variables('FilesAvailableForDownload')}\n<br />\nThemis Inc.",
+                                    "to": "@triggerBody()?['emailAddress']",
+                                    "toname": "@{body('Get_User_By_Email_Address')?['firstName']} @{body('Get_User_By_Email_Address')?['lastName']}"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['sendgrid']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/mail/send"
+                            }
+                        }
+                    },
+                    "outputs": {}
+                },
+                "parameters": {
+                    "$connections": {
+                        "value": {
+                            "azureblob": {
+                                "connectionId": "[resourceId('Microsoft.Web/connections', parameters('Connections.AzureBlobStorage.Name'))]",
+                                "connectionName": "azureblob",
+                                "id": "/subscriptions/0f9d7fea-99e8-4768-8672-06a28514f77e/providers/Microsoft.Web/locations/westeurope/managedApis/azureblob"
+                            },
+                            "sendgrid": {
+                                "connectionId": "[resourceId('Microsoft.Web/connections', parameters('Connections.SendGrid.Name'))]",
+                                "connectionName": "sendgrid",
+                                "id": "/subscriptions/0f9d7fea-99e8-4768-8672-06a28514f77e/providers/Microsoft.Web/locations/westeurope/managedApis/sendgrid"
+                            }
+                        }
+                    }
+                }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/connections', parameters('Connections.AzureBlobStorage.Name'))]",
+                "[resourceId('Microsoft.Web/connections', parameters('Connections.SendGrid.Name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Logic/workflows",
+            "name": "[parameters('LogicApp.TriggerWorkflow.Name')]",
+            "apiVersion": "2017-07-01",
+            "location": "westeurope",
+            "tags": {},
+            "scale": null,
+            "properties": {
+                "state": "Enabled",
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "$connections": {
+                            "defaultValue": {},
+                            "type": "Object"
+                        }
+                    },
+                    "triggers": {
+                        "request": {
+                            "type": "Request",
+                            "kind": "Http",
+                            "inputs": {
+                                "schema": {
+                                    "properties": {
+                                        "emailAddress": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "actions": {
+                        "Archive_Data": {
+                            "runAfter": {},
+                            "type": "ApiManagement",
+                            "inputs": {
+                                "api": {
+                                    "id": "[parameters('ApiManagement.Operations.TriggerConsolidation')]"
+                                },
+                                "method": "post",
+                                "pathTemplate": {
+                                    "parameters": {
+                                        "emailAddress": "@{encodeURIComponent(triggerBody()?['emailAddress'])}"
+                                    },
+                                    "template": "/gdpr-with-azure/users/{emailAddress}/data-consolidation/archive"
+                                },
+                                "subscriptionKey": "@parameters('ApiManagement.Security.ApiKey')"
+                            }
+                        },
+                        "Get_User_By_Email_Address": {
+                            "runAfter": {},
+                            "metadata": {
+                                "apiDefinitionUrl": "[concat('https://', parameters('Apis.Users.HostName'), '/swagger/v1/swagger.json')]",
+                                "swaggerSource": "custom"
+                            },
+                            "type": "Http",
+                            "inputs": {
+                                "method": "get",
+                                "uri": "[concat('https://', parameters('Apis.Users.HostName'), 'api/users/@{encodeURIComponent(triggerBody()?[''emailAddress''])}/profile')]"
+                            }
+                        },
+                        "Response": {
+                            "runAfter": {},
+                            "type": "Response",
+                            "inputs": {
+                                "statusCode": 202
+                            }
+                        },
+                        "Send_email_(V2)": {
+                            "runAfter": {
+                                "Get_User_By_Email_Address": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "body": {
+                                    "from": "tom.kerkhove@codit.eu",
+                                    "fromname": "GDPR with Azure",
+                                    "ishtml": true,
+                                    "subject": "GDPR with Azure - Data Consolidation Started",
+                                    "text": "Hi @{body('Get_User_By_Email_Address')?['firstName']},<br />\n<br />\nWe have started gathering all your information and will notify you when it is available for download.<br />\n<br />\nThemis Inc.",
+                                    "to": "@triggerBody()?['emailAddress']",
+                                    "toname": "@body('Get_User_By_Email_Address')?['displayName']"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['sendgrid']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/mail/send"
+                            }
+                        }
+                    },
+                    "outputs": {}
+                },
+                "parameters": {
+                    "$connections": {
+                        "value": {
+                            "sendgrid": {
+                                "connectionId": "[resourceId('Microsoft.Web/connections', parameters('Connections.SendGrid.Name'))]",
+                                "connectionName": "sendgrid",
+                                "id": "/subscriptions/0f9d7fea-99e8-4768-8672-06a28514f77e/providers/Microsoft.Web/locations/westeurope/managedApis/sendgrid"
+                            }
+                        }
+                    }
+                }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/connections', parameters('Connections.SendGrid.Name'))]"
+            ]
+        },        
+        {
+            "type": "Microsoft.Web/connections",
+            "name": "[parameters('Connections.AzureBlobStorage.Name')]",
+            "apiVersion": "2016-06-01",
+            "location": "westeurope",
+            "scale": null,
+            "properties": {
+                "displayName": "Consolidated-User-Data",
+                "customParameterValues": {},
+                "api": {
+                    "id": "[concat('/subscriptions/0f9d7fea-99e8-4768-8672-06a28514f77e/providers/Microsoft.Web/locations/westeurope/managedApis/azureblob')]"
+                }
+            },
+            "dependsOn": []
+        },
+        {
+            "type": "Microsoft.Web/connections",
+            "name": "[parameters('Connections.SendGrid.Name')]",
+            "apiVersion": "2016-06-01",
+            "location": "westeurope",
+            "scale": null,
+            "properties": {
+                "displayName": "[concat(parameters('Connections.SendGrid.Name'),'Sendgrid', parameters('Connections.SendGrid.Name'))]",
+                "customParameterValues": {},
+                "api": {
+                    "id": "[concat('/subscriptions/0f9d7fea-99e8-4768-8672-06a28514f77e/providers/Microsoft.Web/locations/westeurope/managedApis/sendgrid')]"
+                }
+            },
+            "dependsOn": []
+        }
+    ]
+}
