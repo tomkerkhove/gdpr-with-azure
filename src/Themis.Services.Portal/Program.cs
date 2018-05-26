@@ -15,6 +15,7 @@ namespace Themis.Services.Portal
         {
             return WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
+                .UseApplicationInsights()
                 .Build();
         }
     }
