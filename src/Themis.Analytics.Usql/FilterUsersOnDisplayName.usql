@@ -1,4 +1,4 @@
-﻿// These variables are only for local debugging or on-demand submitting.
+// These variables are only for local debugging or on-demand submitting.
 // Azure Data Factory will inject these as part of the pipeline.
 // DECLARE @userDisplayName string = "tom kerkhove";
 // DECLARE @outputPathFormat string = "gdpr/consolidated-data/tom.kerkhove@codit.eu/{0}";

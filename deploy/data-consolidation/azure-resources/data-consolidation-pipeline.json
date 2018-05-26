@@ -1,0 +1,490 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "DataFactory.Name": {
+            "type": "string",
+            "metadata": "Data Factory Name",
+            "defaultValue": "gdpr-with-azure"
+        },
+        "BlobStorage.UserData.FileName": {
+            "type": "string",
+            "defaultValue": "@concat(toLower(dataset().UserEmailAddress), '/user-profile.csv')"
+        },
+        "BlobStorage.UserData.FolderPath": {
+            "type": "string",
+            "defaultValue": "user-data"
+        },
+        "DataLakeStore.ConsolidateUserData.FileName": {
+            "type": "string",
+            "defaultValue": "user.csv"
+        },
+        "DataLakeStore.ConsolidateUserData.FolderPath": {
+            "type": "string",
+            "defaultValue": "@concat('gdpr/consolidated-data/', dataset().UserEmailAddress) "
+        },
+        "DataLakeAnalytics.DataConsolidation.ServicePrincipalId": {
+            "type": "string",
+            "defaultValue": "a482bc57-c8ad-482e-a599-d95697d9eb42"
+        },
+        "DataLakeAnalytics.DataConsolidation.TenantId": {
+            "type": "string",
+            "defaultValue": "c8819874-9e56-4e3f-b1a8-1c0325138f27"
+        },
+        "DataLakeAnalytics.DataConsolidation.SubscriptionId": {
+            "type": "string",
+            "defaultValue": "0f9d7fea-99e8-4768-8672-06a28514f77e"
+        },
+        "DataLakeAnalytics.DataConsolidation.ResourceGroupName": {
+            "type": "string",
+            "defaultValue": "gdpr-with-azure"
+        },
+        "DataLakeStore.General.TenantId": {
+            "type": "string",
+            "defaultValue": "c8819874-9e56-4e3f-b1a8-1c0325138f27"
+        },
+        "DataLakeStore.General.SubscriptionId": {
+            "type": "string",
+            "defaultValue": "0f9d7fea-99e8-4768-8672-06a28514f77e"
+        },
+        "DataLakeStore.General.ResourceGroupName": {
+            "type": "string",
+            "defaultValue": "gdpr-with-azure"
+        }
+    },
+    "variables": {
+        "factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('DataFactory.Name'))]",
+        "leftBracket": "["
+    },
+    "resources": [
+        {
+            "name": "[concat(parameters('DataFactory.Name'), '/Consolidate-User-Data')]",
+            "type": "Microsoft.DataFactory/factories/pipelines",
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "Send Consolidate Summary",
+                        "type": "WebActivity",
+                        "dependsOn": [
+                            {
+                                "activity": "Get User Information Metadata",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            },
+                            {
+                                "activity": "Consolidate User Data",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false
+                        },
+                        "typeProperties": {
+                            "url": {
+                                "value": "@concat('https://tomkerkhove.azure-api.net/gdpr-with-azure/users/', pipeline().parameters.UserEmailAddress, '/data-consolidation/summary')",
+                                "type": "Expression"
+                            },
+                            "method": "POST",
+                            "headers": {
+                                "Ocp-Apim-Subscription-Key": "fda0bba4f902475d93efedd714bdb9ce"
+                            },
+                            "body": {
+                                "value": "@concat('{ \"fileUris\": [\"', activity('Get User Information Metadata').output.itemName, '\"] }')",
+                                "type": "Expression"
+                            }
+                        }
+                    },
+                    {
+                        "name": "Copy User Information",
+                        "type": "Copy",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false
+                        },
+                        "typeProperties": {
+                            "source": {
+                                "type": "SqlSource",
+                                "sqlReaderStoredProcedureName": "[concat(variables('leftBracket'), 'dbo].[GetUserInformation]')]",
+                                "storedProcedureParameters": {
+                                    "emailAddress": {
+                                        "type": "String",
+                                        "value": {
+                                            "value": "@pipeline().parameters.UserEmailAddress",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                }
+                            },
+                            "sink": {
+                                "type": "BlobSink"
+                            },
+                            "enableStaging": false,
+                            "cloudDataMovementUnits": 0
+                        },
+                        "userProperties": [
+                            {
+                                "name": "Source",
+                                "value": "[concat(variables('leftBracket'), 'dbo].[Users]')]"
+                            },
+                            {
+                                "name": "Destination",
+                                "value": "user-data/@{concat(toLower(pipeline().parameters.UserEmailAddress), '/user-profile.csv')}"
+                            }
+                        ],
+                        "inputs": [
+                            {
+                                "referenceName": "Sql_Users_UserProfile",
+                                "type": "DatasetReference",
+                                "parameters": {}
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "BlobStorage_UserData",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "UserEmailAddress": {
+                                        "value": "@pipeline().parameters.UserEmailAddress",
+                                        "type": "Expression"
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Get User Information Metadata",
+                        "type": "GetMetadata",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy User Information",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false
+                        },
+                        "typeProperties": {
+                            "dataset": {
+                                "referenceName": "BlobStorage_UserData",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "UserEmailAddress": {
+                                        "value": "@pipeline().parameters.UserEmailAddress",
+                                        "type": "Expression"
+                                    }
+                                }
+                            },
+                            "fieldList": [
+                                "itemName",
+                                "exists",
+                                "itemType",
+                                "lastModified"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "Consolidate User Data",
+                        "description": "Consolidate User Application Data",
+                        "type": "DataLakeAnalyticsU-SQL",
+                        "dependsOn": [
+                            {
+                                "activity": "Get User Profile",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false
+                        },
+                        "typeProperties": {
+                            "scriptPath": "job-management/pipelines/FilterUsersOnDisplayName.usql",
+                            "degreeOfParallelism": 4,
+                            "scriptLinkedService": {
+                                "referenceName": "BlobStorage_UserOutput",
+                                "type": "LinkedServiceReference"
+                            },
+                            "parameters": {
+                                "outputPathFormat": {
+                                    "value": "@concat('gdpr/consolidated-data/', pipeline().parameters.UserEmailAddress,'/{0}')",
+                                    "type": "Expression"
+                                },
+                                "userDisplayName": {
+                                    "value": "@activity('Get User Profile').output.firstRow.DisplayName",
+                                    "type": "Expression"
+                                }
+                            }
+                        },
+                        "linkedServiceName": {
+                            "referenceName": "DataLakeAnalytics_DataConsolidation",
+                            "type": "LinkedServiceReference"
+                        }
+                    },
+                    {
+                        "name": "Get User Profile",
+                        "type": "Lookup",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false
+                        },
+                        "typeProperties": {
+                            "source": {
+                                "type": "SqlSource",
+                                "sqlReaderStoredProcedureName": "[concat(variables('leftBracket'), 'dbo].[GetUserInformation]')]",
+                                "storedProcedureParameters": {
+                                    "emailAddress": {
+                                        "type": "String",
+                                        "value": {
+                                            "value": "@pipeline().parameters.UserEmailAddress",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                }
+                            },
+                            "dataset": {
+                                "referenceName": "Sql_Users_UserProfile",
+                                "type": "DatasetReference",
+                                "parameters": {}
+                            }
+                        }
+                    }
+                ],
+                "parameters": {
+                    "UserEmailAddress": {
+                        "type": "String"
+                    }
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/datasets/Sql_Users_UserProfile')]",
+                "[concat(variables('factoryId'), '/datasets/BlobStorage_UserData')]",
+                "[concat(variables('factoryId'), '/linkedServices/BlobStorage_UserOutput')]",
+                "[concat(variables('factoryId'), '/linkedServices/DataLakeAnalytics_DataConsolidation')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('DataFactory.Name'), '/BlobStorage_UserData')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "BlobStorage_UserOutput",
+                    "type": "LinkedServiceReference"
+                },
+                "parameters": {
+                    "UserEmailAddress": {
+                        "type": "String"
+                    }
+                },
+                "type": "AzureBlob",
+                "typeProperties": {
+                    "format": {
+                        "type": "TextFormat",
+                        "columnDelimiter": ",",
+                        "rowDelimiter": "",
+                        "nullValue": "\\N",
+                        "treatEmptyAsNull": true,
+                        "skipLineCount": 0,
+                        "firstRowAsHeader": false
+                    },
+                    "fileName": {
+                        "value": "[parameters('BlobStorage.UserData.FileName')]",
+                        "type": "Expression"
+                    },
+                    "folderPath": "[parameters('BlobStorage.UserData.FolderPath')]"
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/BlobStorage_UserOutput')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('DataFactory.Name'), '/Sql_Users_UserProfile')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "SQL_Themis",
+                    "type": "LinkedServiceReference"
+                },
+                "type": "AzureSqlTable",
+                "typeProperties": {
+                    "tableName": "[concat(variables('leftBracket'), 'dbo].[Users]')]"
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/SQL_Themis')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('DataFactory.Name'), '/DataLakeStore_ConsolidateUserData')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "DataLakeStore_General",
+                    "type": "LinkedServiceReference"
+                },
+                "parameters": {
+                    "UserEmailAddress": {
+                        "type": "String"
+                    }
+                },
+                "type": "AzureDataLakeStoreFile",
+                "typeProperties": {
+                    "format": {
+                        "type": "TextFormat",
+                        "columnDelimiter": ",",
+                        "rowDelimiter": "",
+                        "nullValue": "\\N",
+                        "treatEmptyAsNull": true,
+                        "skipLineCount": 0,
+                        "firstRowAsHeader": false
+                    },
+                    "compression": {
+                        "type": "GZip",
+                        "level": "Fastest"
+                    },
+                    "fileName": "[parameters('DataLakeStore.ConsolidateUserData.FileName')]",
+                    "folderPath": {
+                        "value": "[parameters('DataLakeStore.ConsolidateUserData.FolderPath')]",
+                        "type": "Expression"
+                    }
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/DataLakeStore_General')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('DataFactory.Name'), '/AzureKeyVault_DataIntegration')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+                "type": "AzureKeyVault",
+                "typeProperties": {
+                    "baseUrl": "https://themis-data-integration.vault.azure.net/"
+                }
+            },
+            "dependsOn": []
+        },
+        {
+            "name": "[concat(parameters('DataFactory.Name'), '/SQL_Themis')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+                "type": "AzureSqlDatabase",
+                "typeProperties": {
+                    "connectionString": {
+                        "type": "AzureKeyVaultSecret",
+                        "store": {
+                            "referenceName": "AzureKeyVault_DataIntegration",
+                            "type": "LinkedServiceReference"
+                        },
+                        "secretName": "SQL-Users"
+                    }
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/AzureKeyVault_DataIntegration')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('DataFactory.Name'), '/BlobStorage_UserOutput')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+                "type": "AzureStorage",
+                "typeProperties": {
+                    "connectionString": {
+                        "type": "AzureKeyVaultSecret",
+                        "store": {
+                            "referenceName": "AzureKeyVault_DataIntegration",
+                            "type": "LinkedServiceReference"
+                        },
+                        "secretName": "Storage-User-Output"
+                    }
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/AzureKeyVault_DataIntegration')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('DataFactory.Name'), '/Web_Consolidation_Summary')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+                "type": "HttpServer",
+                "typeProperties": {
+                    "url": "https://prod-25.westeurope.logic.azure.com:443/workflows/2cb91f22bc5045449fa206ac89c1a490/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=FvNgV-UYXBsKjGHVsHCrM5SO0BVwKfjTY2rPRxWzNIM",
+                    "enableServerCertificateValidation": true,
+                    "authenticationType": "Anonymous"
+                }
+            },
+            "dependsOn": []
+        },
+        {
+            "name": "[concat(parameters('DataFactory.Name'), '/DataLakeAnalytics_DataConsolidation')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+                "type": "AzureDataLakeAnalytics",
+                "typeProperties": {
+                    "accountName": "gdprwithazure",
+                    "servicePrincipalId": "[parameters('DataLakeAnalytics.DataConsolidation.ServicePrincipalId')]",
+                    "servicePrincipalKey": {
+                        "type": "AzureKeyVaultSecret",
+                        "store": {
+                            "referenceName": "AzureKeyVault_DataIntegration",
+                            "type": "LinkedServiceReference"
+                        },
+                        "secretName": "DataLakeAnalytics-ServicePrincipleKey"
+                    },
+                    "tenant": "[parameters('DataLakeAnalytics.DataConsolidation.TenantId')]",
+                    "subscriptionId": "[parameters('DataLakeAnalytics.DataConsolidation.SubscriptionId')]",
+                    "resourceGroupName": "[parameters('DataLakeAnalytics.DataConsolidation.ResourceGroupName')]"
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/AzureKeyVault_DataIntegration')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('DataFactory.Name'), '/DataLakeStore_General')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+                "type": "AzureDataLakeStore",
+                "typeProperties": {
+                    "dataLakeStoreUri": "https://gdprwithazure.azuredatalakestore.net/webhdfs/v1",
+                    "tenant": "[parameters('DataLakeStore.General.TenantId')]",
+                    "subscriptionId": "[parameters('DataLakeStore.General.SubscriptionId')]",
+                    "resourceGroupName": "[parameters('DataLakeStore.General.ResourceGroupName')]"
+                }
+            },
+            "dependsOn": []
+        }
+    ]
+}
