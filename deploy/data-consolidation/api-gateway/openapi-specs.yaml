@@ -1,0 +1,68 @@
+swagger: '2.0'
+info:
+  title: GDPR with Azure
+  version: '1.0'
+  description: APIs to start processes that are used to be GDPR compliant
+host: tomkerkhove.azure-api.net
+basePath: "/gdpr-with-azure"
+schemes:
+- https
+securityDefinitions:
+  apiKeyHeader:
+    type: apiKey
+    name: Ocp-Apim-Subscription-Key
+    in: header
+  apiKeyQuery:
+    type: apiKey
+    name: subscription-key
+    in: query
+security:
+- apiKeyHeader: []
+- apiKeyQuery: []
+paths:
+  "/users/{emailAddress}/data-consolidation/initiate":
+    post:
+      description: Initializes all the required processes to consolidate all data
+        for a specific customer
+      operationId: initiate
+      summary: Initiate
+      parameters:
+      - name: emailAddress
+        in: path
+        description: Email address of the user for which data consolidation is requested
+        required: true
+        type: string
+      responses:
+        '202':
+          description: ''
+  "/users/{emailAddress}/data-consolidation/archive":
+    post:
+      description: Triggers the process to archive all the data for a specific customer
+      operationId: archive-data
+      summary: Archive Data
+      parameters:
+      - name: emailAddress
+        in: path
+        description: Email address of the user for which data will be archived and
+          made available
+        required: true
+        type: string
+      responses:
+        '202':
+          description: ''
+  "/users/{emailAddress}/data-consolidation/summary":
+    post:
+      description: Triggers the process to send the summary for the consolidated data
+        for a specific customer
+      operationId: 5b019c7b96d588bc7c556f63
+      summary: Summary
+      parameters:
+      - name: emailAddress
+        in: path
+        description: Email address of the user for which data will be archived and
+          made available
+        required: true
+        type: string
+      responses:
+        '202':
+          description: ''
