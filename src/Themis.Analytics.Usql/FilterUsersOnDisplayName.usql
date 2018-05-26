@@ -1,5 +1,7 @@
-﻿DECLARE @userDisplayName string = "tom kerkhove";
-DECLARE @outputPathFormat string = "gdpr/consolidated-data/tom.kerkhove@codit.eu/{0}";
+﻿// These variables are only for local debugging or on-demand submitting.
+// Azure Data Factory will inject these as part of the pipeline.
+// DECLARE @userDisplayName string = "tom kerkhove";
+// DECLARE @outputPathFormat string = "gdpr/consolidated-data/tom.kerkhove@codit.eu/{0}";
 
 /*
  * Gets all the user profiles across all the websites for a specific display name linked to an account

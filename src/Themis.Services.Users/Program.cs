@@ -14,6 +14,7 @@ namespace Themis.Services.Users
         {
             return WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
+                .UseApplicationInsights()
                 .Build();
         }
     }
