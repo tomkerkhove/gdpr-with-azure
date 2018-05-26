@@ -63,6 +63,21 @@ paths:
           made available
         required: true
         type: string
+      - name: '{   "$id": "http://tomkerkhove.be/gdpr-with-azure",   "type": "object",   "properties":
+          {     "fileUris": {       "$id": "/properties/fileUris",       "type": "array",       "items":
+          {         "$id": "/properties/fileUris/items",         "type": "string",         "title":
+          "Path to a file with user data",         "default": "",         "examples":
+          [           "user-data/kerkhove.tom@gmail.com/user-profile.csv",           "user-data/kerkhove.tom@gmail.com/data.csv"         ]       }     }   },   "required":
+          [     "fileUris"   ] }'
+        in: body
+        schema:
+          example: |-
+            {
+                "fileUris": []
+            }
+        description: Metadata about the output of the archival process
+      consumes:
+      - application/json
       responses:
         '202':
           description: ''
