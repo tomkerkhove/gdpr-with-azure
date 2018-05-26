@@ -1,20 +1,13 @@
-﻿using System;
+﻿using Microsoft.Analytics.Interfaces;
+using Microsoft.Analytics.Interfaces.Streaming;
+using Microsoft.Analytics.Types.Sql;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 
-namespace StackExchange.Analytics.USql
+namespace Themis.Analytics.Usql
 {
-    public static class DataCleansing
-    {
-        public static string CleanseString(string input)
-        {
-            if (string.IsNullOrWhiteSpace(input))
-            {
-                return input;
-            }
-
-            input = input.Trim();
-            input = input.ToLowerInvariant();
-
-            return input;
-        }
-    }
+    
 }
