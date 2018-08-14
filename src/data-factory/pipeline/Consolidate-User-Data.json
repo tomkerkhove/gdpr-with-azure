@@ -1,0 +1,215 @@
+{
+	"name": "Consolidate-User-Data",
+	"properties": {
+		"activities": [
+			{
+				"name": "Send Consolidate Summary",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "Get User Information Metadata",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Consolidate User Data",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false
+				},
+				"typeProperties": {
+					"url": {
+						"value": "@concat('https://tomkerkhove.azure-api.net/gdpr-with-azure/users/', pipeline().parameters.UserEmailAddress, '/data-consolidation/summary')",
+						"type": "Expression"
+					},
+					"method": "POST",
+					"headers": {
+						"Ocp-Apim-Subscription-Key": "fda0bba4f902475d93efedd714bdb9ce"
+					},
+					"body": {
+						"value": "@concat('{ \"fileUris\": [\"', activity('Get User Information Metadata').output.itemName, '\"] }')",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Copy User Information",
+				"type": "Copy",
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false
+				},
+				"userProperties": [
+					{
+						"name": "Source",
+						"value": "[dbo].[Users]"
+					},
+					{
+						"name": "Destination",
+						"value": "user-data/@{concat(toLower(pipeline().parameters.UserEmailAddress), '/user-profile.csv')}"
+					}
+				],
+				"typeProperties": {
+					"source": {
+						"type": "SqlSource",
+						"sqlReaderStoredProcedureName": "[dbo].[GetUserInformation]",
+						"storedProcedureParameters": {
+							"emailAddress": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().parameters.UserEmailAddress",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					"sink": {
+						"type": "BlobSink"
+					},
+					"enableStaging": false,
+					"dataIntegrationUnits": 0
+				},
+				"inputs": [
+					{
+						"referenceName": "Sql_Users_UserProfile",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "BlobStorage_UserData",
+						"type": "DatasetReference",
+						"parameters": {
+							"UserEmailAddress": {
+								"value": "@pipeline().parameters.UserEmailAddress",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "Get User Information Metadata",
+				"type": "GetMetadata",
+				"dependsOn": [
+					{
+						"activity": "Copy User Information",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false
+				},
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "BlobStorage_UserData",
+						"type": "DatasetReference",
+						"parameters": {
+							"UserEmailAddress": {
+								"value": "@pipeline().parameters.UserEmailAddress",
+								"type": "Expression"
+							}
+						}
+					},
+					"fieldList": [
+						"itemName",
+						"exists",
+						"itemType",
+						"lastModified"
+					]
+				}
+			},
+			{
+				"name": "Consolidate User Data",
+				"description": "Consolidate User Application Data",
+				"type": "DataLakeAnalyticsU-SQL",
+				"dependsOn": [
+					{
+						"activity": "Get User Profile",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false
+				},
+				"typeProperties": {
+					"scriptPath": "job-management/pipelines/FilterUsersOnDisplayName.usql",
+					"degreeOfParallelism": 4,
+					"scriptLinkedService": {
+						"referenceName": "BlobStorage_UserOutput",
+						"type": "LinkedServiceReference"
+					},
+					"parameters": {
+						"outputPathFormat": {
+							"value": "@concat('gdpr/consolidated-data/', pipeline().parameters.UserEmailAddress,'/{0}')",
+							"type": "Expression"
+						},
+						"userDisplayName": {
+							"value": "@activity('Get User Profile').output.firstRow.DisplayName",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "DataLakeAnalytics_DataConsolidation",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Get User Profile",
+				"type": "Lookup",
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false
+				},
+				"typeProperties": {
+					"source": {
+						"type": "SqlSource",
+						"sqlReaderStoredProcedureName": "[dbo].[GetUserInformation]",
+						"storedProcedureParameters": {
+							"emailAddress": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().parameters.UserEmailAddress",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					"dataset": {
+						"referenceName": "Sql_Users_UserProfile",
+						"type": "DatasetReference"
+					}
+				}
+			}
+		],
+		"parameters": {
+			"UserEmailAddress": {
+				"type": "String"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

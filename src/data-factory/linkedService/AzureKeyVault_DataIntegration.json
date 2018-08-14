@@ -1,0 +1,10 @@
+{
+	"name": "AzureKeyVault_DataIntegration",
+	"properties": {
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://themis-data-integration.vault.azure.net/"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
+}

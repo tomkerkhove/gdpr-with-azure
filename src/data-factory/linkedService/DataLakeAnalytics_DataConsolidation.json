@@ -1,0 +1,22 @@
+{
+	"name": "DataLakeAnalytics_DataConsolidation",
+	"properties": {
+		"type": "AzureDataLakeAnalytics",
+		"typeProperties": {
+			"accountName": "gdprwithazure",
+			"servicePrincipalId": "a482bc57-c8ad-482e-a599-d95697d9eb42",
+			"servicePrincipalKey": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "AzureKeyVault_DataIntegration",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "DataLakeAnalytics-ServicePrincipleKey"
+			},
+			"tenant": "c8819874-9e56-4e3f-b1a8-1c0325138f27",
+			"subscriptionId": "0f9d7fea-99e8-4768-8672-06a28514f77e",
+			"resourceGroupName": "gdpr-with-azure"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
+}

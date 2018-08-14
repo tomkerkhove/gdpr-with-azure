@@ -1,0 +1,17 @@
+{
+	"name": "SQL_Themis",
+	"properties": {
+		"type": "AzureSqlDatabase",
+		"typeProperties": {
+			"connectionString": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "AzureKeyVault_DataIntegration",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "SQL-Users"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
+}

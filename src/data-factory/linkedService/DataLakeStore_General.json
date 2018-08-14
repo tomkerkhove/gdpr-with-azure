@@ -1,0 +1,13 @@
+{
+	"name": "DataLakeStore_General",
+	"properties": {
+		"type": "AzureDataLakeStore",
+		"typeProperties": {
+			"dataLakeStoreUri": "https://gdprwithazure.azuredatalakestore.net/webhdfs/v1",
+			"tenant": "c8819874-9e56-4e3f-b1a8-1c0325138f27",
+			"subscriptionId": "0f9d7fea-99e8-4768-8672-06a28514f77e",
+			"resourceGroupName": "gdpr-with-azure"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
+}

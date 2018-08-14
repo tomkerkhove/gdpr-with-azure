@@ -1,0 +1,14 @@
+{
+	"name": "Sql_Users_UserProfile",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SQL_Themis",
+			"type": "LinkedServiceReference"
+		},
+		"type": "AzureSqlTable",
+		"typeProperties": {
+			"tableName": "[dbo].[Users]"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

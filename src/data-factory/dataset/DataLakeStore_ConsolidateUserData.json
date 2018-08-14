@@ -1,0 +1,36 @@
+{
+	"name": "DataLakeStore_ConsolidateUserData",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "DataLakeStore_General",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"UserEmailAddress": {
+				"type": "String"
+			}
+		},
+		"type": "AzureDataLakeStoreFile",
+		"typeProperties": {
+			"format": {
+				"type": "TextFormat",
+				"columnDelimiter": ",",
+				"rowDelimiter": "",
+				"nullValue": "\\N",
+				"treatEmptyAsNull": true,
+				"skipLineCount": 0,
+				"firstRowAsHeader": false
+			},
+			"compression": {
+				"type": "GZip",
+				"level": "Fastest"
+			},
+			"fileName": "user.csv",
+			"folderPath": {
+				"value": "@concat('gdpr/consolidated-data/', dataset().UserEmailAddress) ",
+				"type": "Expression"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

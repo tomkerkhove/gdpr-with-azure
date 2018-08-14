@@ -1,0 +1,12 @@
+{
+	"name": "Web_Consolidation_Summary",
+	"properties": {
+		"type": "HttpServer",
+		"typeProperties": {
+			"url": "https://prod-25.westeurope.logic.azure.com:443/workflows/2cb91f22bc5045449fa206ac89c1a490/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=FvNgV-UYXBsKjGHVsHCrM5SO0BVwKfjTY2rPRxWzNIM",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
+}

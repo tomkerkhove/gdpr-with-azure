@@ -1,0 +1,17 @@
+{
+	"name": "BlobStorage_UserOutput",
+	"properties": {
+		"type": "AzureStorage",
+		"typeProperties": {
+			"connectionString": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "AzureKeyVault_DataIntegration",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "Storage-User-Output"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
+}

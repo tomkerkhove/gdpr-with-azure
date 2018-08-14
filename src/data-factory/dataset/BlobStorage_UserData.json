@@ -1,0 +1,32 @@
+{
+	"name": "BlobStorage_UserData",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "BlobStorage_UserOutput",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"UserEmailAddress": {
+				"type": "String"
+			}
+		},
+		"type": "AzureBlob",
+		"typeProperties": {
+			"format": {
+				"type": "TextFormat",
+				"columnDelimiter": ",",
+				"rowDelimiter": "",
+				"nullValue": "\\N",
+				"treatEmptyAsNull": true,
+				"skipLineCount": 0,
+				"firstRowAsHeader": false
+			},
+			"fileName": {
+				"value": "@concat(toLower(dataset().UserEmailAddress), '/user-profile.csv')",
+				"type": "Expression"
+			},
+			"folderPath": "user-data"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
