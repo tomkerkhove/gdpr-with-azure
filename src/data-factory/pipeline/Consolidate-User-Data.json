@@ -275,7 +275,7 @@
 				}
 			},
 			{
-				"name": "Copy Data1",
+				"name": "Copy Consolidated App Data",
 				"type": "Copy",
 				"dependsOn": [
 					{
@@ -315,11 +315,8 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "BlobStorage_UserData",
-						"type": "DatasetReference",
-						"parameters": {
-							"UserEmailAddress": "@pipeline().parameters.UserEmailAddress"
-						}
+						"referenceName": "BlobStorage_ConsolidatedData",
+						"type": "DatasetReference"
 					}
 				]
 			}
