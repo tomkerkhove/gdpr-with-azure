@@ -12,19 +12,6 @@
 		},
 		"type": "AzureDataLakeStoreFile",
 		"typeProperties": {
-			"format": {
-				"type": "TextFormat",
-				"columnDelimiter": ",",
-				"rowDelimiter": "",
-				"nullValue": "\\N",
-				"treatEmptyAsNull": true,
-				"skipLineCount": 0,
-				"firstRowAsHeader": false
-			},
-			"compression": {
-				"type": "GZip",
-				"level": "Fastest"
-			},
 			"fileName": "user.csv",
 			"folderPath": {
 				"value": "@concat('gdpr/consolidated-data/', dataset().UserEmailAddress) ",

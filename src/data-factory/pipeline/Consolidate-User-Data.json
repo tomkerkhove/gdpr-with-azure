@@ -299,7 +299,7 @@
 					},
 					"sink": {
 						"type": "BlobSink",
-						"copyBehavior": "FlattenHierarchy"
+						"copyBehavior": "PreserveHierarchy"
 					},
 					"enableStaging": false,
 					"dataIntegrationUnits": 0
