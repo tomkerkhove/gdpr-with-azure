@@ -13,7 +13,7 @@
 						]
 					},
 					{
-						"activity": "Copy Consolidated App Data",
+						"activity": "Get Consolidated App Data Metadata",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -87,7 +87,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "BlobStorage_UserData_Folder",
+						"referenceName": "BlobStorage_UserData",
 						"type": "DatasetReference",
 						"parameters": {
 							"UserEmailAddress": {
@@ -117,7 +117,43 @@
 				},
 				"typeProperties": {
 					"dataset": {
-						"referenceName": "BlobStorage_UserData_Folder",
+						"referenceName": "BlobStorage_UserData",
+						"type": "DatasetReference",
+						"parameters": {
+							"UserEmailAddress": {
+								"value": "@pipeline().parameters.UserEmailAddress",
+								"type": "Expression"
+							}
+						}
+					},
+					"fieldList": [
+						"itemName",
+						"exists",
+						"itemType",
+						"lastModified"
+					]
+				}
+			},
+			{
+				"name": "Get Consolidated App Data Metadata",
+				"type": "GetMetadata",
+				"dependsOn": [
+					{
+						"activity": "Copy Consolidated App Data",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false
+				},
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "BlobStorage_ConsolidatedData",
 						"type": "DatasetReference",
 						"parameters": {
 							"UserEmailAddress": {
