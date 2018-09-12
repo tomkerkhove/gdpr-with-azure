@@ -93,7 +93,8 @@
 							"UserEmailAddress": {
 								"value": "@pipeline().parameters.UserEmailAddress",
 								"type": "Expression"
-							}
+							},
+							"FileName": "user-profile.csv"
 						}
 					}
 				]
@@ -245,13 +246,14 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "BlobStorage_ConsolidatedData",
+						"referenceName": "BlobStorage_UserData_Folder",
 						"type": "DatasetReference",
 						"parameters": {
 							"UserEmailAddress": {
 								"value": "@pipeline().parameters.UserEmailAddress",
 								"type": "Expression"
-							}
+							},
+							"FileName": "consolidated-app-data.csv"
 						}
 					}
 				]
