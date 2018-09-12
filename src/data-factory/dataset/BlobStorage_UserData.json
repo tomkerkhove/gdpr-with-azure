@@ -1,5 +1,5 @@
 {
-	"name": "BlobStorage_UserData_Folder",
+	"name": "BlobStorage_UserData",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "BlobStorage_UserOutput",
@@ -9,6 +9,9 @@
 			"UserEmailAddress": {
 				"type": "String"
 			}
+		},
+		"folder": {
+			"name": "User Data"
 		},
 		"type": "AzureBlob",
 		"typeProperties": {
