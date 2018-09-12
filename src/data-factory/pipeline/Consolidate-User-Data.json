@@ -35,7 +35,7 @@
 						"Ocp-Apim-Subscription-Key": "fda0bba4f902475d93efedd714bdb9ce"
 					},
 					"body": {
-						"value": "@concat('{ \"fileUris\": [\"', activity('Get User Information Metadata').output.itemName,' \\,', activity('Get Consolidated App Data Metadata').output.itemName, '\"] }')",
+						"value": "@concat('{ \"fileUris\": [\"', activity('Get User Information Metadata').output.itemName, '\" ,\"', activity('Get Consolidated App Data Metadata').output.itemName, '\"] }')",
 						"type": "Expression"
 					}
 				}
