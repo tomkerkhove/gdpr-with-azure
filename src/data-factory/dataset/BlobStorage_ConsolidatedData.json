@@ -5,20 +5,21 @@
 			"referenceName": "BlobStorage_UserOutput",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"UserEmailAddress": {
+				"type": "String"
+			}
+		},
 		"folder": {
 			"name": "Data Consolidation"
 		},
 		"type": "AzureBlob",
 		"typeProperties": {
-			"format": {
-				"type": "TextFormat",
-				"columnDelimiter": ",",
-				"rowDelimiter": "",
-				"nullValue": "\\N",
-				"treatEmptyAsNull": true,
-				"skipLineCount": 0,
-				"firstRowAsHeader": false
-			}
+			"fileName": {
+				"value": "@concat(toLower(dataset().UserEmailAddress), '/consolidated-app-data.csv')",
+				"type": "Expression"
+			},
+			"folderPath": "user-data"
 		}
 	}
 }
