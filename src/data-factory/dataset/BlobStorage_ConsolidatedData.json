@@ -1,0 +1,25 @@
+{
+	"name": "BlobStorage_ConsolidatedData",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "BlobStorage_UserOutput",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"UserEmailAddress": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "Data Consolidation"
+		},
+		"type": "AzureBlob",
+		"typeProperties": {
+			"fileName": {
+				"value": "@concat(toLower(dataset().UserEmailAddress), '/consolidated-app-data.csv')",
+				"type": "Expression"
+			},
+			"folderPath": "user-data"
+		}
+	}
+}

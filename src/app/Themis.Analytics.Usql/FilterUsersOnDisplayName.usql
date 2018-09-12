@@ -31,7 +31,7 @@
                      Id AS UserId,
                      AccountId
               FROM @users
-              WHERE DisplayName.ToLower() == @userDisplayName;
+              WHERE DisplayName.Equals(@userDisplayName, StringComparison.InvariantCultureIgnoreCase);
     
 OUTPUT @foundUsers
 TO string.Format(@outputPathFormat, "user.csv")

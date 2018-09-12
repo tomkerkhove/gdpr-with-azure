@@ -10,6 +10,9 @@
 				"type": "String"
 			}
 		},
+		"folder": {
+			"name": "User Data"
+		},
 		"type": "AzureBlob",
 		"typeProperties": {
 			"format": {

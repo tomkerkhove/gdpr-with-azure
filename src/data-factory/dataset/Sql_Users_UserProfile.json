@@ -5,6 +5,9 @@
 			"referenceName": "SQL_Themis",
 			"type": "LinkedServiceReference"
 		},
+		"folder": {
+			"name": "User Data"
+		},
 		"type": "AzureSqlTable",
 		"typeProperties": {
 			"tableName": "[dbo].[Users]"
