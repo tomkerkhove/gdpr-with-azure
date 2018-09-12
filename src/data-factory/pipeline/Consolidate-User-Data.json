@@ -13,7 +13,7 @@
 						]
 					},
 					{
-						"activity": "Consolidate User Data",
+						"activity": "Copy Consolidated App Data",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -202,76 +202,6 @@
 						"referenceName": "Sql_Users_UserProfile",
 						"type": "DatasetReference"
 					}
-				}
-			},
-			{
-				"name": "Get Consolidated Data information",
-				"description": "",
-				"type": "GetMetadata",
-				"dependsOn": [
-					{
-						"activity": "Consolidate User Data",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "7.00:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"typeProperties": {
-					"dataset": {
-						"referenceName": "DataLakeStore_ConsolidateUserData",
-						"type": "DatasetReference",
-						"parameters": {
-							"UserEmailAddress": "@pipeline().parameters.UserEmailAddress"
-						}
-					},
-					"fieldList": [
-						"exists",
-						"itemName",
-						"itemType",
-						"lastModified",
-						"size",
-						"structure"
-					]
-				}
-			},
-			{
-				"name": "Lookup Consolidated Data information",
-				"type": "Lookup",
-				"dependsOn": [
-					{
-						"activity": "Consolidate User Data",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "7.00:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"typeProperties": {
-					"source": {
-						"type": "AzureDataLakeStoreSource",
-						"recursive": true
-					},
-					"dataset": {
-						"referenceName": "DataLakeStore_ConsolidateUserData",
-						"type": "DatasetReference",
-						"parameters": {
-							"UserEmailAddress": "@pipeline().parameters.UserEmailAddress"
-						}
-					},
-					"firstRowOnly": false
 				}
 			},
 			{
