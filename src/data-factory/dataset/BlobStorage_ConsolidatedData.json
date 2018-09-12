@@ -5,6 +5,9 @@
 			"referenceName": "BlobStorage_UserOutput",
 			"type": "LinkedServiceReference"
 		},
+		"folder": {
+			"name": "Data Consolidation"
+		},
 		"type": "AzureBlob",
 		"typeProperties": {
 			"format": {
