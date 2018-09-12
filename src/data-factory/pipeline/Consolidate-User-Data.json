@@ -246,7 +246,13 @@
 				"outputs": [
 					{
 						"referenceName": "BlobStorage_ConsolidatedData",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"UserEmailAddress": {
+								"value": "@pipeline().parameters.UserEmailAddress",
+								"type": "Expression"
+							}
+						}
 					}
 				]
 			}
