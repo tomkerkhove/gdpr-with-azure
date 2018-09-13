@@ -1,0 +1,10 @@
+{
+	"name": "Sql_OnPrem",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Sql_OnPrem",
+			"type": "LinkedServiceReference"
+		},
+		"type": "SqlServerTable"
+	}
+}
