@@ -1,0 +1,6 @@
+{
+	"name": "Demo-Sandbox",
+	"properties": {
+		"type": "SelfHosted"
+	}
+}
