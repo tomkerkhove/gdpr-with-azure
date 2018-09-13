@@ -22,7 +22,17 @@
 						"writeBatchSize": 10000
 					},
 					"enableStaging": false,
-					"dataIntegrationUnits": 0
+					"dataIntegrationUnits": 0,
+					"translator": {
+						"type": "TabularTranslator",
+						"columnMappings": {
+							"EmailAddress": "EmailAddress",
+							"City": "City",
+							"Country": "Country",
+							"FirstName": "Name",
+							"Street": "Street"
+						}
+					}
 				},
 				"inputs": [
 					{
