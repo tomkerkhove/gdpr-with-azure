@@ -5,6 +5,9 @@
 			"referenceName": "Sql_OnPrem",
 			"type": "LinkedServiceReference"
 		},
+		"folder": {
+			"name": "Hybrid Data Movement"
+		},
 		"type": "SqlServerTable",
 		"structure": [
 			{
