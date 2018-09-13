@@ -12,23 +12,33 @@
 		"structure": [
 			{
 				"name": "EmailAddress",
-				"type": "String"
+				"type": "String",
+				"description": "Email address of the user"
 			},
 			{
-				"name": "City",
-				"type": "String"
+				"name": "FirstName",
+				"type": "String",
+				"description": "First name of the user"
+			},
+			{
+				"name": "LastName",
+				"type": "String",
+				"description": "Last name of the user"
 			},
 			{
 				"name": "Country",
-				"type": "String"
+				"type": "String",
+				"description": "Country where the user lives"
 			},
 			{
-				"name": "Name",
-				"type": "String"
+				"name": "City",
+				"type": "String",
+				"description": "City where the user lives"
 			},
 			{
 				"name": "Street",
-				"type": "String"
+				"type": "String",
+				"description": "Street where the user lives"
 			}
 		],
 		"typeProperties": {
