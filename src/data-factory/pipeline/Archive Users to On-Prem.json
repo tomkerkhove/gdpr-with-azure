@@ -1,5 +1,5 @@
 {
-	"name": "User Backup to On-Prem",
+	"name": "Archive Users to On-Prem",
 	"properties": {
 		"description": "Copies all users from Cloud to On-Prem.",
 		"activities": [
