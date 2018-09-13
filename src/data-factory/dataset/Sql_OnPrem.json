@@ -5,6 +5,9 @@
 			"referenceName": "Sql_OnPrem",
 			"type": "LinkedServiceReference"
 		},
-		"type": "SqlServerTable"
+		"type": "SqlServerTable",
+		"typeProperties": {
+			"tableName": "[dbo].[Users]"
+		}
 	}
 }
