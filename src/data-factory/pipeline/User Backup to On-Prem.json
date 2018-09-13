@@ -18,8 +18,7 @@
 						"type": "SqlSource"
 					},
 					"sink": {
-						"type": "SqlSink",
-						"writeBatchSize": 10000
+						"type": "BlobSink"
 					},
 					"enableStaging": false,
 					"dataIntegrationUnits": 0
@@ -32,7 +31,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "Sql_OnPrem",
+						"referenceName": "BlobStorage_ConsolidatedData",
 						"type": "DatasetReference"
 					}
 				]
