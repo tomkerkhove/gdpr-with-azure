@@ -19,7 +19,8 @@
 					},
 					"sink": {
 						"type": "SqlSink",
-						"writeBatchSize": 10000
+						"writeBatchSize": 10000,
+						"preCopyScript": "TRUNCATE TABLE dbo.Users"
 					},
 					"enableStaging": false,
 					"dataIntegrationUnits": 0,
