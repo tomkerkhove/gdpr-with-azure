@@ -23,7 +23,18 @@
 						"preCopyScript": "TRUNCATE TABLE dbo.Users"
 					},
 					"enableStaging": false,
-					"dataIntegrationUnits": 0
+					"dataIntegrationUnits": 0,
+					"translator": {
+						"type": "TabularTranslator",
+						"columnMappings": {
+							"EmailAddress": "EmailAddress",
+							"FirstName": "FirstName",
+							"LastName": "LastName",
+							"Country": "Country",
+							"City": "City",
+							"Street": "Street"
+						}
+					}
 				},
 				"inputs": [
 					{
