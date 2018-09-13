@@ -1,0 +1,54 @@
+{
+	"name": "Archive Users to On-Prem",
+	"properties": {
+		"description": "Copies all users from Cloud to On-Prem.",
+		"activities": [
+			{
+				"name": "Copy Users To On-Prem",
+				"type": "Copy",
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"typeProperties": {
+					"source": {
+						"type": "SqlSource"
+					},
+					"sink": {
+						"type": "SqlSink",
+						"writeBatchSize": 10000,
+						"preCopyScript": "TRUNCATE TABLE dbo.Users"
+					},
+					"enableStaging": false,
+					"dataIntegrationUnits": 0,
+					"translator": {
+						"type": "TabularTranslator",
+						"columnMappings": {
+							"EmailAddress": "EmailAddress",
+							"FirstName": "FirstName",
+							"LastName": "LastName",
+							"Country": "Country",
+							"City": "City",
+							"Street": "Street"
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "Sql_Users_UserProfile",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "Sql_OnPrem_Users",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		]
+	}
+}

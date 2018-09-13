@@ -1,5 +1,5 @@
 {
-	"name": "integrationRuntime1",
+	"name": "Demo-Sandbox",
 	"properties": {
 		"type": "SelfHosted"
 	}

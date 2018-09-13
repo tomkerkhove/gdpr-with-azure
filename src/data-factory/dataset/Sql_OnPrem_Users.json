@@ -1,0 +1,48 @@
+{
+	"name": "Sql_OnPrem_Users",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Sql_OnPrem",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Hybrid Data Movement"
+		},
+		"type": "SqlServerTable",
+		"structure": [
+			{
+				"name": "EmailAddress",
+				"type": "String",
+				"description": "Email address of the user"
+			},
+			{
+				"name": "FirstName",
+				"type": "String",
+				"description": "First name of the user"
+			},
+			{
+				"name": "LastName",
+				"type": "String",
+				"description": "Last name of the user"
+			},
+			{
+				"name": "Country",
+				"type": "String",
+				"description": "Country where the user lives"
+			},
+			{
+				"name": "City",
+				"type": "String",
+				"description": "City where the user lives"
+			},
+			{
+				"name": "Street",
+				"type": "String",
+				"description": "Street where the user lives"
+			}
+		],
+		"typeProperties": {
+			"tableName": "[dbo].[Users]"
+		}
+	}
+}
