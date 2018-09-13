@@ -1,6 +1,7 @@
 {
-	"name": "pipeline1",
+	"name": "User Backup to On-Prem",
 	"properties": {
+		"description": "Copies all users from Cloud to On-Prem.",
 		"activities": [
 			{
 				"name": "Copy Users To On-Prem",

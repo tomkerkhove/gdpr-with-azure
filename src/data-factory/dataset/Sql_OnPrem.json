@@ -6,6 +6,32 @@
 			"type": "LinkedServiceReference"
 		},
 		"type": "SqlServerTable",
+		"structure": [
+			{
+				"name": "EmailAddress",
+				"type": "String"
+			},
+			{
+				"name": "City",
+				"type": "String"
+			},
+			{
+				"name": "Country",
+				"type": "String"
+			},
+			{
+				"name": "FirstName",
+				"type": "String"
+			},
+			{
+				"name": "LastName",
+				"type": "String"
+			},
+			{
+				"name": "Street",
+				"type": "String"
+			}
+		],
 		"typeProperties": {
 			"tableName": "[dbo].[Users]"
 		}

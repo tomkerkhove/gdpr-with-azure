@@ -9,6 +9,36 @@
 			"name": "User Data"
 		},
 		"type": "AzureSqlTable",
+		"structure": [
+			{
+				"name": "EmailAddress",
+				"type": "String"
+			},
+			{
+				"name": "City",
+				"type": "String"
+			},
+			{
+				"name": "Country",
+				"type": "String"
+			},
+			{
+				"name": "DisplayName",
+				"type": "String"
+			},
+			{
+				"name": "FirstName",
+				"type": "String"
+			},
+			{
+				"name": "LastName",
+				"type": "String"
+			},
+			{
+				"name": "Street",
+				"type": "String"
+			}
+		],
 		"typeProperties": {
 			"tableName": "[dbo].[Users]"
 		}
