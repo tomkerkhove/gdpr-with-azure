@@ -1,5 +1,5 @@
 {
-	"name": "Sql_OnPrem",
+	"name": "Sql_OnPrem_Users",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "Sql_OnPrem",
