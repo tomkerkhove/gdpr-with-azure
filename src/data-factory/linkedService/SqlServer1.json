@@ -1,0 +1,15 @@
+{
+	"name": "SqlServer1",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"type": "SqlServer",
+		"typeProperties": {
+			"connectionString": "integrated security=False;data source=.\\SQLExpress;initial catalog=Codito;user id=demo",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiJkODQ3MmViNi05M2YwLTQwZWItYTA1My1mZjg1YWVhZjBjODYiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+		},
+		"connectVia": {
+			"referenceName": "Demo-Sandbox",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
